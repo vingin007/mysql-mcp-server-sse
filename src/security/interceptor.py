@@ -57,8 +57,12 @@ class SQLInterceptor:
             # 检查SQL是否有效
             if not parsed_sql['is_valid']:
                 raise SecurityException("SQL语句格式无效")
-                
+
             operation = parsed_sql['operation_type']
+
+            # 特殊处理 WITH 语法（CTE 查询）
+            if sql_query.strip().upper().startswith("WITH "):
+                operation = "SELECT"
             # 更新支持的操作类型列表，包括元数据操作
             supported_operations = SQLConfig.DDL_OPERATIONS | SQLConfig.DML_OPERATIONS | SQLConfig.METADATA_OPERATIONS
                 
