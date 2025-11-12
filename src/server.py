@@ -49,7 +49,7 @@ logger.debug(f"服务器配置: host={host}, port={port}")
 
 # 创建MCP服务器实例
 logger.debug("正在创建MCP服务器实例...")
-mcp = FastMCP("MySQL Query Server", "cccccccccc", host=host, port=port, debug=True, endpoint='/sse')
+mcp = FastMCP("MySQL Query Server", "cccccccccc", host=host, port=port, debug=True)
 logger.debug("MCP服务器实例创建完成")
 
 def auto_register_tools(mcp):
