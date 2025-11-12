@@ -1,24 +1,22 @@
 FROM python:3.12-slim
 
-RUN apt-get update && \
+# ==== 使用国内 apt 源，加速系统依赖安装 ====
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|mirrors.aliyun.com/debian-security|g' /etc/apt/sources.list && \
+    apt-get clean && \
+    apt-get update -o Acquire::CompressionTypes::Order::=gz && \
+    apt-get install -y --no-install-recommends build-essential curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 复制本地代码到镜像
-COPY . .
+COPY requirements.txt .
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir -r requirements.txt
 
-# 自动生成 .env（如不存在则复制 example.env）
+COPY . .
 RUN [ -f .env ] || cp example.env .env
 
-# 安装依赖
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 暴露端口（如需）
 EXPOSE 3000
+ENV HOST=0.0.0.0 PORT=3000
 
-# 支持环境变量覆盖
-ENV HOST=0.0.0.0 \
-    PORT=3000
-
-CMD ["python", "-m", "src.server"] 
+CMD ["python", "-m", "src.server"]
